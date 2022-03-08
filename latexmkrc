@@ -20,3 +20,6 @@ $dvi_mode = 0;
 
 # Configure xelatex engine
 push @generated_exts, "xdv";
+
+# Remove extra extensions on clean
+$clean_ext = "bbl run.xml";

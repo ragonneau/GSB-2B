@@ -15,7 +15,7 @@
 LC := latexmk
 LCFLAGS := -file-line-error -halt-on-error -interaction=nonstopmode
 
-all: main
+all: gsb-2b
 
 %: %.tex
 	$(LC) $(LCFLAGS) $^

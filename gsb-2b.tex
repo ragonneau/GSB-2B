@@ -14,6 +14,7 @@
 % The Current Maintainer of this work is Tom M. Ragonneau.
 \documentclass[11pt]{article}
 \usepackage[a4paper]{geometry}
+\usepackage[dvipsnames]{xcolor}
 \usepackage[american]{babel}
 \usepackage{csquotes}
 \usepackage{array}
@@ -24,9 +25,39 @@
 \usepackage{fontspec}
 \setmainfont{TeX Gyre Pagella}
 
+% Bibliography information
+\usepackage[%
+    style=numeric-comp,%
+    sorting=nyt,%
+    sortcites,%
+]{biblatex}
+\addbibresource{ragonneau-bib/strings.bib}
+\addbibresource{ragonneau-bib/optim.bib}
+
+% Mathematics
+\usepackage{amsmath}
+\usepackage{dsfont}
+\def\R{\ensuremath{\mathds{R}}}
+
 % Cross-referencing and colorization
 \usepackage{hyperref}
 \usepackage{url}
+\hypersetup{%
+    colorlinks=true,%
+    linkcolor=OliveGreen,%
+    anchorcolor=black,%
+    citecolor=MidnightBlue,%
+    filecolor=black,%
+    menucolor=black,%
+    runcolor=black,%
+    urlcolor=black,%
+    linktoc=page,%
+}
+
+% Automatic references
+\usepackage[noabbrev]{cleveref}
+\crefname{equation}{}{}
+\Crefname{equation}{}{}
 
 % Spacing between lines
 \usepackage{setspace}
@@ -74,10 +105,41 @@
 
     \maketitle
 
-    \noindent\textbf{Thesis title} --- Model-Based Derivative-Free Optimization Methods and Software.
+    \noindent\textbf{Thesis title} ---
+    Model-Based Derivative-Free Optimization Methods and Software.
 
     \vspace{1pc}
 
-    \noindent\textbf{Brief description} --- To do.
+    \noindent\textbf{Brief description} ---
+    The vast majority of the existing optimization algorithms rely on classical or generalized derivative information.
+    However, such information is unavailable or prohibitively expensive to assess in numerous industrial or research applications.
+    Such applications include aircraft engineering~\cite{Gazaix_Etal_2019}, machine and reinforcement learning~\cite{Ghanbari_Scheinberg_2017,Qian_Yu_2021}, and chemical product design~\cite{Sun_Etal_2020}.
+
+    It is against this background that we developed COBYQA.
+    It is a derivative-free method designed to tackle the nonlinearly-constrained optimization problem
+    \begin{subequations}
+        \label{eq:nlcp}
+        \begin{align}
+            \min        & \quad f(x) \label{eq:nlcp-obj}\\
+            \text{s.t.} & \quad c_i(x) \le 0, ~ i \in \mathcal{I}, \label{eq:nlcp-cub}\\
+                        & \quad c_i(x) = 0, ~ i \in \mathcal{E}, \label{eq:nlcp-ceq}\\
+                        & \quad l \le x \le u, \label{eq:nlcp-bds}\\
+                        & \quad x \in \R^n, \nonumber
+        \end{align}
+    \end{subequations}
+    where the objective and constraint functions~$f$ and~$c_i$, with~$i \in \mathcal{I} \cup \mathcal{E}$, are real-valued functions on~$\R^n$, and the bounds~$l \in (\R \cup \{-\infty\})^n$ and~$u \in (\R \cup \{+\infty\})^n$ satisfy~$l < u$.
+    In opposition to the general constraints~\cref{eq:nlcp-cub,eq:nlcp-ceq}, we assume that the bound constraints~\cref{eq:nlcp-bds} cannot be violated, as they often represent inalienable physical or theoretical constraints.
+    Hence, COBYQA ensures this property.
+
+    The mathematical framework behind COBYQA is a derivative-free variation of the sequential quadratic programming paradigm.
+    The convergence properties of the method are globalized by embedding it in a trust-region framework.
+    The resulting trust-region subproblem is solved iteratively, using Byrd-Omojokun-like composite steps~\cite{Byrd_1987,Omojokun_1989} to address its possible infeasibility.
+    The quadratic models maintained by COBYQA are based on Powell's derivative-free symmetric Broyden update~\cite[\S 3.6]{Fletcher_1987}.
+    The different subproblems are solved numerically using constrained variations of the truncated conjugate gradient method, designed to preserve the bound constraints~\cref{eq:nlcp-bds}.
+
+    A Python implementation of COBYQA\footnote{Available at \url{https://cobyqa.readthedocs.io/}.} is publicly available.
+    It has been carefully developed to maintain acceptable computational complexity and to handle computer rounding errors arising in the quadratic models.
+
+    \printbibliography
 
 \end{document}
