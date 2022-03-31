@@ -112,11 +112,16 @@
 
     \noindent\textbf{Brief description} ---
     The vast majority of the existing optimization algorithms rely on classical or generalized derivative information.
-    However, such information is unavailable or prohibitively expensive to assess in numerous industrial or research applications.
-    Such applications include aircraft engineering~\cite{Gazaix_Etal_2019}, machine and reinforcement learning~\cite{Ghanbari_Scheinberg_2017,Qian_Yu_2021}, and chemical product design~\cite{Sun_Etal_2020}.
+    However, such information is unavailable or prohibitively expensive to assess in numerous applications, especially when the problems are derived from experiments or simulations, such as in machine learning~\cite{Ghanbari_Scheinberg_2017}.
+    Derivative-free optimization (DFO) is designed to tackle such problems~\cite{Audet_Hare_2017,Conn_Scheinberg_Vicente_2009b}.
 
-    It is against this background that we developed COBYQA.
-    It is a derivative-free method designed to tackle the nonlinearly-constrained optimization problem
+    Powell designed five DFO methods for unconstrained and constrained problems, namely UOBYQA~\cite{Powell_2002}, NEWUOA~\cite{Powell_2006}, BOBYQA~\cite{Powell_2009}, LINCOA, and COBYLA~\cite{Powell_1994}.
+    He implemented them in Fortran 77, which is not convenient for most users.
+    Hence, we developed PDFO\footnote{Available at \url{https://www.pdfo.net/}.}, a MATLAB and Python software for using Powell's DFO solvers.
+
+    COBYLA, designed to tackle nonlinearly-constrained problems, uses linear models of the objective and constraint functions.
+    Hence, we developed COBYQA\footnote{Available at \url{https://cobyqa.readthedocs.io/}.}, a method that uses quadratic models, to attempt to overtake the performances of COBYLA.
+    It is a derivative-free method designed to solve the nonlinearly-constrained problem
     \begin{subequations}
         \label{eq:nlcp}
         \begin{align}
@@ -129,16 +134,14 @@
     \end{subequations}
     where the objective and constraint functions~$f$ and~$c_i$, with~$i \in \mathcal{I} \cup \mathcal{E}$, are real-valued functions on~$\R^n$, and the bounds~$l \in (\R \cup \{-\infty\})^n$ and~$u \in (\R \cup \{+\infty\})^n$ satisfy~$l < u$.
     In opposition to the general constraints~\cref{eq:nlcp-cub,eq:nlcp-ceq}, we assume that the bound constraints~\cref{eq:nlcp-bds} cannot be violated, as they often represent inalienable physical or theoretical constraints.
-    Hence, COBYQA ensures this property.
+    Hence, COBYQA always respects the bound constraints~\cref{eq:nlcp-bds}.
 
-    The mathematical framework behind COBYQA is a derivative-free variation of the sequential quadratic programming paradigm.
-    The convergence properties of the method are globalized by embedding it in a trust-region framework.
-    The resulting trust-region subproblem is solved iteratively, using Byrd-Omojokun-like composite steps~\cite{Byrd_1987,Omojokun_1989} to address its possible infeasibility.
-    The quadratic models maintained by COBYQA are based on Powell's derivative-free symmetric Broyden update~\cite[\S 3.6]{Fletcher_1987}.
-    The different subproblems are solved numerically using constrained variations of the truncated conjugate gradient method, designed to preserve the bound constraints~\cref{eq:nlcp-bds}.
-
-    A Python implementation of COBYQA\footnote{Available at \url{https://cobyqa.readthedocs.io/}.} is publicly available.
-    It has been carefully developed to maintain acceptable computational complexity and to handle computer rounding errors arising in the quadratic models.
+    The mathematical framework behind COBYQA is a derivative-free variation of the sequential quadratic programming method.
+    The convergence properties of COBYQA are globalized by embedding it in a trust-region framework.
+    The resulting trust-region subproblem is solved iteratively, using Byrd-Omojokun-like composite steps to address its possible infeasibility.
+    The quadratic models maintained by COBYQA are based on the derivative-free symmetric Broyden update~\cite[\S 3.6]{Fletcher_1987}.
+    The normal and tangential subproblems are solved numerically using constrained variations of the truncated conjugate gradient method, designed to preserve the bound constraints~\cref{eq:nlcp-bds}.
+    A Python implementation of COBYQA has been carefully developed and is publicly available.
 
     \printbibliography
 
