@@ -12,8 +12,10 @@
 % This work has the LPPL maintenance status `maintained'.
 %
 % The Current Maintainer of this work is Tom M. Ragonneau.
-\documentclass[11pt]{article}
-\usepackage[a4paper]{geometry}
+\documentclass[10pt]{article}
+\usepackage[%
+    a4paper,%
+]{geometry}
 \usepackage[dvipsnames]{xcolor}
 \usepackage[american]{babel}
 \usepackage{csquotes}
@@ -37,7 +39,7 @@
 % Mathematics
 \usepackage{amsmath}
 \usepackage{dsfont}
-\def\R{\ensuremath{\mathds{R}}}
+\newcommand{\R}{\ensuremath{\mathds{R}}}
 
 % Cross-referencing and colorization
 \usepackage{hyperref}
@@ -68,12 +70,13 @@
 \input{ushyphex}
 
 % Redefine \maketitle command and set the end of the document
-\makeatletter
-\renewcommand{\maketitle}{%
-    \begin{center}%
-    {\LARGE\bfseries\@title\par}%
-        \vspace{2pc}%
-    \end{center}%
+\AtBeginDocument{%
+    \renewcommand{\maketitle}{%
+        \begin{center}%
+        {\LARGE\bfseries\thetitle\par}%
+            \vspace{2pc}%
+        \end{center}%
+    }%
 }
 \AtEndDocument{%
     \vfill%
@@ -81,25 +84,23 @@
     \setlength{\extrarowheight}{1pc}%
     \noindent\begin{tabularx}{\textwidth}{@{}lX@{}}%
                  Signature      & \\ \cline{2-2}%
-                 Student name   & \textit{\@author} \\ \cline{2-2}%
-                 Date           & \textit{\@date} \\ \cline{2-2}%
+                 Student name   & \textit{\theauthor} \\ \cline{2-2}%
+                 Date           & \textit{\thedate} \\ \cline{2-2}%
     \end{tabularx}%
     \endgroup%
 }
-\makeatother
 
 % Document metadata
+\usepackage{titling}
 \title{Brief description of the thesis}
 \author{Tom M. Ragonneau}
 \date{\today}
-\makeatletter
 \hypersetup{%
-    pdftitle=\@title,%
-    pdfauthor=\@author,%
+    pdftitle=\thetitle,%
+    pdfauthor=\theauthor,%
     pdfsubject={},%
     pdfkeywords={},%
 }
-\makeatother
 
 \begin{document}
 
@@ -113,14 +114,19 @@
     \noindent\textbf{Brief description} ---
     The vast majority of the existing optimization algorithms rely on classical or generalized derivative information.
     However, such information is unavailable or prohibitively expensive to assess in numerous applications, especially when the problems are derived from experiments or simulations, such as in machine learning~\cite{Ghanbari_Scheinberg_2017}.
-    Derivative-free optimization (DFO) is designed to tackle such problems~\cite{Audet_Hare_2017,Conn_Scheinberg_Vicente_2009b}.
+    Derivative-free optimization (DFO) is designed to tackle such problems~\cite{Audet_Hare_2017,Conn_Scheinberg_Vicente_2009b}, and this thesis investigates various numerical methods for solving DFO problems.
+    It is split into two parts.
+    We first present PDFO, a software we developed for interfacing Powell's DFO solvers.
+    The second part of this thesis introduces COBYQA, a new method for solving nonlinearly-constrained DFO problems.
 
-    Powell designed five DFO methods for unconstrained and constrained problems, namely UOBYQA~\cite{Powell_2002}, NEWUOA~\cite{Powell_2006}, BOBYQA~\cite{Powell_2009}, LINCOA, and COBYLA~\cite{Powell_1994}.
+    Late Professor M.\ J.\ D.\ Powell designed five DFO methods for unconstrained and constrained problems, namely UOBYQA~\cite{Powell_2002}, NEWUOA~\cite{Powell_2006}, BOBYQA~\cite{Powell_2009}, LINCOA, and COBYLA~\cite{Powell_1994}.
     He implemented them in Fortran 77, which is not convenient for most users.
     Hence, we developed PDFO\footnote{Available at \url{https://www.pdfo.net/}.}, a MATLAB and Python software for using Powell's DFO solvers.
+    PDFO provides slightly modified versions of Powell's solvers, as we patched the original Fortran code to avoid infinite cycling and memory errors.
+    We detected such errors for ill-conditioned problems during the initial development and testing of PDFO\@.
 
     COBYLA, designed to tackle nonlinearly-constrained problems, uses linear models of the objective and constraint functions.
-    Hence, we developed COBYQA\footnote{Available at \url{https://cobyqa.readthedocs.io/}.}, a method that uses quadratic models, to attempt to overtake the performances of COBYLA.
+    We hence developed in the second part of this thesis COBYQA\footnote{Available at \url{https://cobyqa.readthedocs.io/}.}, a method that uses quadratic models, to attempt to overtake the performances of COBYLA\@.
     It is a derivative-free method designed to solve the nonlinearly-constrained problem
     \begin{subequations}
         \label{eq:nlcp}
