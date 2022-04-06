@@ -24,8 +24,9 @@
 
 % Latin fonts
 \usepackage[T1]{fontenc}
-\usepackage{fontspec}
-\setmainfont{TeX Gyre Pagella}
+%\usepackage{fontspec}
+%\setmainfont{TeX Gyre Pagella}
+
 
 % Bibliography information
 \usepackage[%
@@ -112,21 +113,29 @@
     \vspace{1pc}
 
     \noindent\textbf{Brief description} ---
-    The vast majority of the existing optimization algorithms rely on classical or generalized derivative information.
-    However, such information is unavailable or prohibitively expensive to assess in numerous applications, especially when the problems are derived from experiments or simulations, such as in machine learning~\cite{Ghanbari_Scheinberg_2017}.
-    Derivative-free optimization (DFO) is designed to tackle such problems~\cite{Audet_Hare_2017,Conn_Scheinberg_Vicente_2009b}, and this thesis investigates various numerical methods for solving DFO problems.
-    It is split into two parts.
-    We first present PDFO, a software we developed for interfacing Powell's DFO solvers.
+    The vast majority of existing optimization algorithms rely on classical or generalized derivative information.
+    However, such information is unavailable or prohibitively expensive to assess in numerous applications,
+    especially when the problems are involve experiments or simulations, as is frequently the
+    case in industrial applications and more recently in machine learning~\cite{Ghanbari_Scheinberg_2017}.
+    Derivative-free optimization (DFO) is designed to tackle such problems~\cite{Audet_Hare_2017,Conn_Scheinberg_Vicente_2009b}.
+    In this thesis, we study DFO methods that exploit interpolation models and develop software based on them.
+    It consist of two major parts.
+    We first present PDFO, a piece of software we implement for interfacing Powell's DFO solvers.
     The second part of this thesis introduces COBYQA, a new method for solving nonlinearly-constrained DFO problems.
 
-    Late Professor M.\ J.\ D.\ Powell designed five DFO methods for unconstrained and constrained problems, namely UOBYQA~\cite{Powell_2002}, NEWUOA~\cite{Powell_2006}, BOBYQA~\cite{Powell_2009}, LINCOA, and COBYLA~\cite{Powell_1994}.
-    He implemented them in Fortran 77, which is not convenient for most users.
-    Hence, we developed PDFO\footnote{Available at \url{https://www.pdfo.net/}.}, a MATLAB and Python software for using Powell's DFO solvers.
-    PDFO provides slightly modified versions of Powell's solvers, as we patched the original Fortran code to avoid infinite cycling and memory errors.
+    Late Professor M.\ J.\ D.\ Powell designed five DFO methods for unconstrained and constrained problems,
+    namely UOBYQA~\cite{Powell_2002}, NEWUOA~\cite{Powell_2006}, BOBYQA~\cite{Powell_2009}, LINCOA, and COBYLA~\cite{Powell_1994}.
+    He implemented them in Fortran 77,  which hinders some users from applying them.
+    Hence, we develop PDFO\footnote{Available at \url{https://www.pdfo.net/}.}, a MATLAB and Python
+    package based on Powell's DFO solvers.
+    PDFO provides lightly modified versions of Powell's solvers. The modifications include patches to avoid infinite
+    cycling and memory errors.
     We detected such errors for ill-conditioned problems during the initial development and testing of PDFO\@.
 
     COBYLA, designed to tackle nonlinearly-constrained problems, uses linear models of the objective and constraint functions.
-    We hence developed in the second part of this thesis COBYQA\footnote{Available at \url{https://cobyqa.readthedocs.io/}.}, a method that uses quadratic models, to attempt to overtake the performances of COBYLA\@.
+    However, linear models cannot capture the curvature information, which is essential for fast convergence.
+    We hence develop in the second part of this thesis COBYQA\footnote{Available at
+    \url{https://cobyqa.readthedocs.io/}.}, a method that uses quadratic models.
     It is a derivative-free method designed to solve the nonlinearly-constrained problem
     \begin{subequations}
         \label{eq:nlcp}
@@ -138,15 +147,18 @@
                         & \quad x \in \R^n, \nonumber
         \end{align}
     \end{subequations}
-    where the objective and constraint functions~$f$ and~$c_i$, with~$i \in \mathcal{I} \cup \mathcal{E}$, are real-valued functions on~$\R^n$, and the bounds~$l \in (\R \cup \{-\infty\})^n$ and~$u \in (\R \cup \{+\infty\})^n$ satisfy~$l < u$.
-    In opposition to the general constraints~\cref{eq:nlcp-cub,eq:nlcp-ceq}, we assume that the bound constraints~\cref{eq:nlcp-bds} cannot be violated, as they often represent inalienable physical or theoretical constraints.
-    Hence, COBYQA always respects the bound constraints~\cref{eq:nlcp-bds}.
+    where the objective and constraint functions~$f$ and~$c_i$, with~$i \in \mathcal{I} \cup
+    \mathcal{E}$, are real-valued functions on~$\R^n$, and the bounds~$l \in (\R \cup
+    \{-\infty\})^n$ and~$u \in (\R \cup \{+\infty\})^n$ satisfy~$l < u$.
+    A feature of COBYQA is that it always respects the bound constraints~~\cref{eq:nlcp-bds}, as
+    they often represent inalienable physical or theoretical restrictions.
 
-    The mathematical framework behind COBYQA is a derivative-free variation of the sequential quadratic programming method.
-    The convergence properties of COBYQA are globalized by embedding it in a trust-region framework.
-    The resulting trust-region subproblem is solved iteratively, using Byrd-Omojokun-like composite steps to address its possible infeasibility.
-    The quadratic models maintained by COBYQA are based on the derivative-free symmetric Broyden update~\cite[\S 3.6]{Fletcher_1987}.
-    The normal and tangential subproblems are solved numerically using constrained variations of the truncated conjugate gradient method, designed to preserve the bound constraints~\cref{eq:nlcp-bds}.
+    The mathematical framework underneath COBYQA is a derivative-free variation of the sequential quadratic programming (SQP) method.
+    It is embedded in a trust-region paradigm to ensure the global convergence.
+    The trust-region subproblem is solved iteratively, using Byrd-Omojokun-like composite steps to address its possible infeasibility.
+    The normal and tangential steps are calculated using constrained variations of the truncated conjugate gradient method,
+    particularly devised to preserve the bound constraints~\cref{eq:nlcp-bds}.
+    The quadratic models in COBYQA are updated by the derivative-free symmetric Broyden method~\cite{Powell_1970b,Powell_2013}.
     A Python implementation of COBYQA has been carefully developed and is publicly available.
 
     \printbibliography
