@@ -15,17 +15,19 @@
 \documentclass[10pt]{article}
 \usepackage[%
     a4paper,%
+    margin=1.3in,%
 ]{geometry}
 \usepackage[dvipsnames]{xcolor}
 \usepackage[american]{babel}
 \usepackage{csquotes}
+\usepackage{microtype}
 \usepackage{array}
 \usepackage{tabularx}
 
 % Latin fonts
 \usepackage[T1]{fontenc}
-%\usepackage{fontspec}
-%\setmainfont{TeX Gyre Pagella}
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Pagella}
 
 
 % Bibliography information
@@ -33,6 +35,7 @@
     style=numeric-comp,%
     sorting=nyt,%
     sortcites,%
+    maxnames=99,%
 ]{biblatex}
 \addbibresource{ragonneau-bib/strings.bib}
 \addbibresource{ragonneau-bib/optim.bib}
@@ -61,6 +64,14 @@
 \usepackage[noabbrev]{cleveref}
 \crefname{equation}{}{}
 \Crefname{equation}{}{}
+
+% Terms and acronyms processing
+\RequirePackage[acronym]{glossaries-extra}
+\setabbreviationstyle[acronym]{long-short}
+\glsdisablehyper
+\makeglossaries
+\newacronym{dfo}{DFO}{derivative-free optimization}
+\newacronym{sqp}{SQP}{sequential quadratic programming}
 
 % Spacing between lines
 \usepackage{setspace}
@@ -114,52 +125,43 @@
 
     \noindent\textbf{Brief description} ---
     The vast majority of existing optimization algorithms rely on classical or generalized derivative information.
-    However, such information is unavailable or prohibitively expensive to assess in numerous applications,
-    especially when the problems are involve experiments or simulations, as is frequently the
-    case in industrial applications and more recently in machine learning~\cite{Ghanbari_Scheinberg_2017}.
-    Derivative-free optimization (DFO) is designed to tackle such problems~\cite{Audet_Hare_2017,Conn_Scheinberg_Vicente_2009b}.
-    In this thesis, we study DFO methods that exploit interpolation models and develop software based on them.
-    It consist of two major parts.
-    We first present PDFO, a piece of software we implement for interfacing Powell's DFO solvers.
-    The second part of this thesis introduces COBYQA, a new method for solving nonlinearly-constrained DFO problems.
+    However, such information is unavailable or prohibitively expensive to assess in numerous applications, especially when the problems involve experiments or simulations, as is frequently the case in industrial applications such as nuclear energy density optimization~\cite{Kortelainen_Etal_2010} and noisy nonlinear least-squares problems~\cite{Cartis_Etal_2019} for instance.
+    \Gls{dfo} is designed to tackle such problems~\cite{Audet_Hare_2017,Conn_Scheinberg_Vicente_2009b}.
+    This thesis studies \gls{dfo} methods that exploit interpolation models and develop software based on them.
+    It consists of two major parts.
+    We first present PDFO, a piece of software we implement for interfacing Powell's \gls{dfo} solvers.
+    The second part of this thesis introduces COBYQA, a new method for solving nonlinearly-constrained \gls{dfo} problems.
 
-    Late Professor M.\ J.\ D.\ Powell designed five DFO methods for unconstrained and constrained problems,
-    namely UOBYQA~\cite{Powell_2002}, NEWUOA~\cite{Powell_2006}, BOBYQA~\cite{Powell_2009}, LINCOA, and COBYLA~\cite{Powell_1994}.
-    He implemented them in Fortran 77,  which hinders some users from applying them.
-    Hence, we develop PDFO\footnote{Available at \url{https://www.pdfo.net/}.}, a MATLAB and Python
-    package based on Powell's DFO solvers.
-    PDFO provides lightly modified versions of Powell's solvers. The modifications include patches to avoid infinite
-    cycling and memory errors.
+    Late Professor M.\ J.\ D.\ Powell designed five \gls{dfo} methods for both unconstrained and constrained problems, namely UOBYQA~\cite{Powell_2002}, NEWUOA~\cite{Powell_2006}, BOBYQA~\cite{Powell_2009}, LINCOA, and COBYLA~\cite{Powell_1994}.
+    He implemented them in Fortran 77, which hinders some users from applying them.
+    Hence, we develop PDFO\footnote{Available at \url{https://www.pdfo.net/}.}, a MATLAB and Python package based on Powell's \gls{dfo} solvers.
+    PDFO provides lightly modified versions of Powell's solvers.
+    The modifications include patches to avoid infinite cyclings and memory errors.
     We detected such errors for ill-conditioned problems during the initial development and testing of PDFO\@.
 
     COBYLA, designed to tackle nonlinearly-constrained problems, uses linear models of the objective and constraint functions.
     However, linear models cannot capture the curvature information, which is essential for fast convergence.
-    We hence develop in the second part of this thesis COBYQA\footnote{Available at
-    \url{https://cobyqa.readthedocs.io/}.}, a method that uses quadratic models.
+    Therefore, in the second part of this thesis, we develop COBYQA\footnote{Available at \url{https://cobyqa.readthedocs.io/}.}, a method that uses quadratic models.
     It is a derivative-free method designed to solve the nonlinearly-constrained problem
     \begin{subequations}
-        \label{eq:nlcp}
         \begin{align}
-            \min        & \quad f(x) \label{eq:nlcp-obj}\\
-            \text{s.t.} & \quad c_i(x) \le 0, ~ i \in \mathcal{I}, \label{eq:nlcp-cub}\\
-                        & \quad c_i(x) = 0, ~ i \in \mathcal{E}, \label{eq:nlcp-ceq}\\
-                        & \quad l \le x \le u, \label{eq:nlcp-bds}\\
-                        & \quad x \in \R^n, \nonumber
+            \min_{x \in \R^n}   & \quad f(x)\\
+            \text{s.t.}         & \quad c_i(x) \le 0, ~ i \in \mathcal{I},\\
+                                & \quad c_i(x) = 0, ~ i \in \mathcal{E},\\
+                                & \quad l \le x \le u, \label{eq:nlcp-bds}
         \end{align}
     \end{subequations}
     where the objective and constraint functions~$f$ and~$c_i$, with~$i \in \mathcal{I} \cup
     \mathcal{E}$, are real-valued functions on~$\R^n$, and the bounds~$l \in (\R \cup
-    \{-\infty\})^n$ and~$u \in (\R \cup \{+\infty\})^n$ satisfy~$l < u$.
-    A feature of COBYQA is that it always respects the bound constraints~~\cref{eq:nlcp-bds}, as
-    they often represent inalienable physical or theoretical restrictions.
+    \{-\infty\})^n$ and~$u \in (\R \cup \{+\infty\})^n$ satisfy~$l \le u$.
 
-    The mathematical framework underneath COBYQA is a derivative-free variation of the sequential quadratic programming (SQP) method.
-    It is embedded in a trust-region paradigm to ensure the global convergence.
-    The trust-region subproblem is solved iteratively, using Byrd-Omojokun-like composite steps to address its possible infeasibility.
-    The normal and tangential steps are calculated using constrained variations of the truncated conjugate gradient method,
-    particularly devised to preserve the bound constraints~\cref{eq:nlcp-bds}.
-    The quadratic models in COBYQA are updated by the derivative-free symmetric Broyden method~\cite{Powell_1970b,Powell_2013}.
-    A Python implementation of COBYQA has been carefully developed and is publicly available.
+    The mathematical framework underneath COBYQA is a derivative-free variation of the \gls{sqp} method, where progress towards solutions is measured using an~$\ell_2$-merit function.
+    It is embedded in a trust-region paradigm to ensure global convergence.
+    A feature of COBYQA is that all the points at which the objective and constraint functions are evaluated respect the bound constraints~\cref{eq:nlcp-bds}, as they often represent inalienable physical or theoretical restrictions.
+    The trust-region subproblem is solved using Byrd-Omojokun-like composite steps to address its possible infeasibility.
+    The normal and tangential steps are calculated using constrained variations of the truncated conjugate gradient method, conceived to preserve the bound constraints~\cref{eq:nlcp-bds}.
+    The quadratic models of the objective and constraint functions are updated by the derivative-free symmetric Broyden method~\cite{Powell_1970b,Powell_2013}.
+    A Python implementation of COBYQA is carefully developed and is publicly available.
 
     \printbibliography
 
