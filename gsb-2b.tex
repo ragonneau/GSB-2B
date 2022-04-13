@@ -125,11 +125,11 @@
 
     \noindent\textbf{Brief description} ---
     The vast majority of existing optimization algorithms rely on classical or generalized derivative information.
-    However, such information is unavailable or prohibitively expensive to assess in numerous applications, especially when the problems involve experiments or simulations, as is frequently the case in industrial applications such as nuclear energy density optimization~\cite{Kortelainen_Etal_2010} and noisy nonlinear least-squares problems~\cite{Cartis_Etal_2019} for instance.
-    \Gls{dfo} is designed to tackle such problems~\cite{Audet_Hare_2017,Conn_Scheinberg_Vicente_2009b}.
+    However, such information is unavailable or prohibitively expensive to assess in numerous applications, especially when the problems involve experiments or simulations, as is frequently the case in industrial and engineering applications, and noisy nonlinear least-squares problems~\cite{Cartis_Etal_2019} for instance.
+    \Gls{dfo} is designed to tackle such problems~\cite{Audet_Hare_2017,Conn_Scheinberg_Vicente_2009b,Larson_Menickelly_Wild_2019}.
     This thesis studies \gls{dfo} methods that exploit interpolation models and develop software based on them.
     It consists of two major parts.
-    We first present PDFO, a piece of software we implement for interfacing Powell's \gls{dfo} solvers.
+    We first present PDFO, a piece of software we implement for interfacing Powell's \gls{dfo} solvers with MATLAB and Python.
     The second part of this thesis introduces COBYQA, a new method for solving nonlinearly-constrained \gls{dfo} problems.
 
     Late Professor M.\ J.\ D.\ Powell designed five \gls{dfo} methods for both unconstrained and constrained problems, namely UOBYQA~\cite{Powell_2002}, NEWUOA~\cite{Powell_2006}, BOBYQA~\cite{Powell_2009}, LINCOA, and COBYLA~\cite{Powell_1994}.
